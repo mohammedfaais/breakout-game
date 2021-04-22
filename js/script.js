@@ -96,15 +96,49 @@ function moveBall(){
         ball.dy *=  -1;
      }
 
-     if(ball.x - ball.size >paddle.x &&
+    if(ball.x - ball.size >paddle.x &&
         ball.x + ball.size < paddle.x + paddle.width &&
         ball.y + ball.size > paddle.y
         ){
            ball.dy = -ball.speed; 
         }
+    bricks.forEach(column => {
+        column.forEach(brick =>{
+            if(brick.visible){
+                if(
+                    ball.x - ball.size > brick.x &&
+                    ball.x + ball.size < brick.x + brick.width &&
+                    ball.y + ball.size > brick.y &&
+                    ball.y - ball.size < brick.y + brick.height
+                ){
+                    ball.dy *= -1;
+                    brick.visible = false;
 
+                    scoreIncrease();
+                }
+            }
+        } )
+    })
+
+    if(ball.y + ball.size > canvas.height){
+        showAllBricks();
+        score = 0;
+    }
 }
 
+function scoreIncrease(){
+    score++;
+
+    if(score % (brickRow * brickRow) === 0){
+        showAllBricks();
+    }
+}
+
+function showAllBricks(){
+    bricks.forEach(column => {
+        column.forEach(brick => (brick.visible = true));
+    });
+}
 
 function draw(){
    ctx.clearRect(0, 0, canvas.width, canvas.height);
