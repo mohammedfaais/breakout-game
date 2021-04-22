@@ -19,6 +19,7 @@ const paddle = {
     y : canvas.height -20,
     width : 80,
     height : 10,
+    speed :8,
     dx : 0
 }
 
@@ -73,13 +74,76 @@ function createBrick(){
     })
 }
 
+function movePaddle(){
+    paddle.x += paddle.dx;
+
+    if(paddle.x + paddle.width > canvas.width){
+        paddle.x = canvas.width - paddle.width;
+    }
+    if(paddle.x < 0){
+        paddle.x = 0;
+    }
+}
+
+function moveBall(){
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    if(ball.x + ball.size > canvas.width || ball.x - ball.size < 0){
+       ball.dx *=  -1;
+    }
+    if(ball.y + ball.size > canvas.width || ball.y - ball.size < 0){
+        ball.dy *=  -1;
+     }
+
+     if(ball.x - ball.size >paddle.x &&
+        ball.x + ball.size < paddle.x + paddle.width &&
+        ball.y + ball.size > paddle.y
+        ){
+           ball.dy = -ball.speed; 
+        }
+
+}
+
 
 function draw(){
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
    createBall();
    createPaddle();
    createScore();
    createBrick();
 }
 
-draw();
 
+
+function update() {
+    movePaddle();
+    moveBall();
+
+    draw();
+
+    requestAnimationFrame(update);
+}
+
+update();
+
+function keyDown(e){
+    if(e.key === 'Right' || e.key === 'ArrowRight'){
+      paddle.dx = paddle.speed;
+    }else if(e.key === 'Left' || e.key === 'ArrowLeft' ){
+      paddle.dx = -paddle.speed;
+    }
+}
+
+function keyUp(e){
+    if(e.key === 'Right' ||
+       e.key === 'ArrowRight'||
+       e.key === 'Left' ||
+       e.key === 'ArrowLeft'
+    ){
+        paddle.dx= 0;
+    }
+}
+
+document.addEventListener('keydown',keyDown);
+document.addEventListener('keyup',keyUp);
